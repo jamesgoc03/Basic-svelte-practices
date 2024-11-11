@@ -1,0 +1,53 @@
+body {
+    background-color: #202020;
+    color: white;
+}
+
+.title {
+    font-size: 2.7rem;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.character {
+    background-color: #101010;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.character img {
+    border-radius: 10px 10px 0 0;
+}
+
+.buttons {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    width: 200px;
+    margin: 20px auto 20px auto;
+}
+
+.button {
+    background-color: #303030;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.number {
+    background-color: transparent;
+    cursor: default;
+}
