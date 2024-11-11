@@ -1,82 +1,153 @@
 <script lang="ts">
-    import { error } from "@sveltejs/kit";
-import Header from "./Header.svelte"
+	import Header from './Header.svelte';
+    import { fly } from 'svelte/transition';
+	import '../app.css';
 
-    let name: string = $state("John");
-    let status: "open" | "closed" = $state("open")
-    let fullName = $derived(name + " " + "last name");
-    let formState = $state({
-        name: "",
-        birthday: "",
-        step: 0,
-        error: ""
-    })
+	let step: number = $state(0);
+	let canContinue: boolean = $state(true);
+	let person = $state({
+		name: '',
+		age: 0,
+		gender: ''
+	});
 
-    function toggle() {
-        status = status === "open" ? "closed" : "open";
-    }
+	function goOn(field: string) {
+		if (field == '') {
+			canContinue = false;
+		} else {
+			step++;
+			canContinue = true;
+		}
+	}
 </script>
 
-<Header {name} />
-<h2>Hello again {fullName}</h2>
-<input type="text" bind:value={name}>
-
-<p>The store is now {status}</p>
-<button onclick={toggle}>Toggle status</button>
-<button onclick={() => {
-    status = status === "open" ? "closed" : "open";
-}}>Toggle status</button>
-
 <main>
-    <p>Step: {formState.step}</p>
-    {@render formStep({question: "What is your name?", id: "name", type: "text"})}
-
-    {#if formState.step === 0}
-        <div>
-            <label for="name">Your name</label>
-            <input type="text" id="name" bind:value={formState.name}>
-            <button onclick={() => {
-                if(formState.name !== "") {
-                    formState.step += 1;
-                    formState.error = "";
-                } else {
-                    formState.error = "Your name is Empty. Please write your name";
-                }    
-            }}>Next</button>
-        </div>
-    {:else if formState.step == 1}
-        <div>
-            <label for="birth">Your birthday</label>
-            <input type="text" id="birth" bind:value={formState.birthday}>
-            <button onclick={() => {
-                if(formState.birthday !== "") {
-                    formState.step += 1;
-                    formState.error = "";
-                } else {
-                    formState.error = "Your birthday is Empty. Please write your birthday";
-                }    
-            }}>Next</button>
-        </div> 
-    {/if}
-    {#if formState.error}
-        <p class="error">{formState.error}</p>
-    {/if}
+	<Header name={person.name} />
+	<h4>STEP 0{step + 1}</h4>
+	{#if step === 0}
+		<div
+			in:fly={{ y: 50, duration: 1000, opacity: 0}}
+		>
+			<label for="name">What is your name?</label>
+			<input id="name" bind:value={person.name} type="text" placeholder="Your name" />
+			<button onclick={() => goOn(person.name)}>Next Step</button>
+		</div>
+	{:else if step === 1}
+		<div
+			in:fly={{ y: 50, duration: 1000, opacity: 0 }}
+		>
+			<label for="age">What is your age?</label>
+			<input id="age" bind:value={person.age} type="number" placeholder="Your age" />
+			<button
+				onclick={() => {
+					if (person.age <= 0) {
+						canContinue = false;
+					} else {
+						step++;
+						canContinue = true;
+					}
+				}}>Next Step</button
+			>
+		</div>
+	{:else if step === 2}
+		<div
+			in:fly={{ y: 50, duration: 1000, opacity: 0}}
+		>
+			<label for="gender">What is your gender?</label>
+			<input id="gender" bind:value={person.gender} type="text" placeholder="Your gender" />
+			<button onclick={() => goOn(person.gender)}>Next Step</button>
+		</div>
+	{/if}
+	{#if step > 2}
+        <span 
+            in:fly={{ y: 50, duration: 1000, opacity: 0, delay: 500}}
+        >
+            <h2 class="info">Welcome, {person.name}!</h2>
+		    <p class="info">Your age is {person.age} and you gender is {person.gender}</p>
+        </span>
+	{/if}
+	{#if !canContinue}
+		<p class="error">You need to introduce something.</p>
+	{/if}
 </main>
 
-
-{#snippet formStep({question, id, type}: 
-                   {question:string, id:string, type:string})}
-    <article>
-        <div>
-            <label for={id}>{question}</label>
-            <input type={type} id={id} bind:value={formState[id]}>
-        </div>
-    </article>
-{/snippet}
-
-
 <style>
-    .error {
-        color: red;
-    }
+	main {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100vh;
+		background-color: #101010;
+	}
+
+	div {
+		width: 300px;
+		height: 250px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		border-radius: 10px;
+		background-color: black;
+	}
+
+	h4 {
+		color: #ffffff;
+		margin-bottom: 10px;
+		text-align: center;
+		position: fixed;
+		top: 100px;
+		font-size: 18px;
+	}
+
+	label {
+		align-self: flex-start;
+		margin-left: 50px;
+		margin-bottom: 5px;
+		color: #cccccc;
+	}
+
+	input {
+		margin-bottom: 20px;
+		padding: 10px;
+		border-radius: 5px;
+		border: none;
+		background-color: #ffffff;
+		color: #000000;
+		width: 200px;
+	}
+
+	button {
+		padding: 10px 20px;
+		border-radius: 5px;
+		border: none;
+		background-color: #444444;
+		color: #ffffff;
+		cursor: pointer;
+		transition: background-color 0.25s ease-in-out;
+		width: 200px;
+	}
+
+	button:disabled {
+		background-color: #cccccc;
+		cursor: not-allowed;
+	}
+
+	button:hover {
+		background-color: #101010;
+	}
+
+	.error {
+		color: rgb(136, 9, 9);
+		position: fixed;
+		bottom: 150px;
+	}
+
+	.info {
+		color: #ffffff;
+		font-size: 20px;
+		text-align: center;
+		display: block;
+	}
 </style>
